@@ -4,7 +4,7 @@ services:
   backend:
     restart: always
     build:
-      context: .
+      context: ./backend
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
@@ -14,7 +14,7 @@ services:
       - ttd_network
   ollama:
     build:
-      context: .
+      context: ./backend
       dockerfile: Dockerfile.ollama
     networks:
       - ttd_network
