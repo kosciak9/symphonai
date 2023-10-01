@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "personal"
+version = "0.1.0"
+description = ""
+authors = ["Franciszek Madej <f.madej@protonmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+torch = "^2.0.1"
+# transformers = "^4.33.4"
+sentencepiece = "^0.1.99"
+fastapi = "^0.103.2"
+uvicorn = "^0.23.2"
+sacremoses = "^0.0.53"
+pydantic = "^2.4.2"
+accelerate = "^0.23.0"
+requests = "^2.31.0"
+types-requests = "^2.31.0.6"
+mypy = "^1.5.1"
+transformers = "^4.33.3"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

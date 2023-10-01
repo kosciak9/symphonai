@@ -1,0 +1,22 @@
+version: "3.8"
+
+services:
+  backend:
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - LLAMA_HOST=http://ollama:11434
+    networks:
+      - ttd_network
+  ollama:
+    build:
+      context: .
+      dockerfile: Dockerfile.ollama
+    networks:
+      - ttd_network
+networks:
+  ttd_network:
