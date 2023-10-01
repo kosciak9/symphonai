@@ -20,6 +20,14 @@ very simple idea:
 
 ## run
 
-easiest way - clone and `docker-compose up`
+- easiest way - clone and `docker-compose up`
 
-you need to enable GPU support for your machine on your own
+  - you need to enable GPU support for your machine on your own
+  - without proper GPU support, it will be very slow
+
+- harder / easier way (depends on environment, Ollama.app is faster on M1 MacBooks):
+
+  - open `backend` and do `poetry install && poetry run uvicorn main:app`
+  - open `Ollama` app on your mac / linux machine
+  - open `frontend`, run `pnpm i && pnpm dev`, go to
+    [localhost:3000](http://localhost:3000)
