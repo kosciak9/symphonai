@@ -1,0 +1,343 @@
+{
+  "id": "00000000-0000-0000-0000-000000000000",
+  "prevId": "",
+  "version": "5",
+  "dialect": "pg",
+  "tables": {
+    "jpk_naglowek": {
+      "name": "jpk_naglowek",
+      "schema": "",
+      "columns": {
+        "naglowek_id": {
+          "name": "naglowek_id",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "czas_wyslania": {
+          "name": "czas_wyslania",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "czas_utworzenia": {
+          "name": "czas_utworzenia",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "data_od": {
+          "name": "data_od",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "data_do": {
+          "name": "data_do",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "rokmc": {
+          "name": "rokmc",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "jpk_podmiot": {
+      "name": "jpk_podmiot",
+      "schema": "",
+      "columns": {
+        "podmiot_id": {
+          "name": "podmiot_id",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "naglowek_id": {
+          "name": "naglowek_id",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "nip": {
+          "name": "nip",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "imie": {
+          "name": "imie",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "nazwisko": {
+          "name": "nazwisko",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "data_urodzenia": {
+          "name": "data_urodzenia",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "telefon": {
+          "name": "telefon",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "idx_16390_sqlite_autoindex_jpk_podmiot_1": {
+          "name": "idx_16390_sqlite_autoindex_jpk_podmiot_1",
+          "columns": [
+            "podmiot_id"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {
+        "jpk_podmiot_naglowek_id_fkey": {
+          "name": "jpk_podmiot_naglowek_id_fkey",
+          "tableFrom": "jpk_podmiot",
+          "tableTo": "jpk_naglowek",
+          "columnsFrom": [
+            "naglowek_id"
+          ],
+          "columnsTo": [
+            "naglowek_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "vat_sprzedaz": {
+      "name": "vat_sprzedaz",
+      "schema": "",
+      "columns": {
+        "sprzedaz_id": {
+          "name": "sprzedaz_id",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "naglowek_id": {
+          "name": "naglowek_id",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "nr_kontrahenta": {
+          "name": "nr_kontrahenta",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "dowod_sprzedazy": {
+          "name": "dowod_sprzedazy",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "data_wystawienia": {
+          "name": "data_wystawienia",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "data_sprzedazy": {
+          "name": "data_sprzedazy",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_6": {
+          "name": "p_6",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_8": {
+          "name": "p_8",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_9": {
+          "name": "p_9",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_11": {
+          "name": "p_11",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_13": {
+          "name": "p_13",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_15": {
+          "name": "p_15",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_16": {
+          "name": "p_16",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_19": {
+          "name": "p_19",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_96": {
+          "name": "p_96",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "idx_16396_sqlite_autoindex_vat_sprzedaz_1": {
+          "name": "idx_16396_sqlite_autoindex_vat_sprzedaz_1",
+          "columns": [
+            "sprzedaz_id"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {
+        "vat_sprzedaz_naglowek_id_fkey": {
+          "name": "vat_sprzedaz_naglowek_id_fkey",
+          "tableFrom": "vat_sprzedaz",
+          "tableTo": "jpk_naglowek",
+          "columnsFrom": [
+            "naglowek_id"
+          ],
+          "columnsTo": [
+            "naglowek_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "vat_zakup": {
+      "name": "vat_zakup",
+      "schema": "",
+      "columns": {
+        "zakup_id": {
+          "name": "zakup_id",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "naglowek_id": {
+          "name": "naglowek_id",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "nr_dostawcy": {
+          "name": "nr_dostawcy",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "dowod_zakupu": {
+          "name": "dowod_zakupu",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "data_zakupu": {
+          "name": "data_zakupu",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "data_wplywu": {
+          "name": "data_wplywu",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_61": {
+          "name": "p_61",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_77": {
+          "name": "p_77",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_78": {
+          "name": "p_78",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "idx_16402_sqlite_autoindex_vat_zakup_1": {
+          "name": "idx_16402_sqlite_autoindex_vat_zakup_1",
+          "columns": [
+            "zakup_id"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {
+        "vat_zakup_naglowek_id_fkey": {
+          "name": "vat_zakup_naglowek_id_fkey",
+          "tableFrom": "vat_zakup",
+          "tableTo": "jpk_naglowek",
+          "columnsFrom": [
+            "naglowek_id"
+          ],
+          "columnsTo": [
+            "naglowek_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "_meta": {
+    "schemas": {},
+    "tables": {},
+    "columns": {}
+  }
+}

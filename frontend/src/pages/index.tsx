@@ -16,6 +16,7 @@ import {
   FormLabel,
   HStack,
   Input,
+  Switch,
   Table,
   TableCaption,
   TableContainer,
@@ -48,6 +49,7 @@ export default function Chat() {
     }>
   >([]);
   const [databaseSchema, setDatabaseSchema] = useState("");
+  const [shouldTranslate, setShouldTranslate] = useState(false);
   const [databaseUrl, setDatabaseUrl] = useState<string | null>(
     "postgresql://postgres:postgres@localhost:5432/postgres",
   );
@@ -55,13 +57,22 @@ export default function Chat() {
   const toast = useToast();
   const generateChat = api.exampleRouter.getResponse.useMutation({
     onSuccess: (data) => {
-      setChatHistory([
-        ...chatHistory,
-        {
-          type: "bot",
-          message: data.sql_code,
-        },
-      ]);
+      if (typeof data.sql_code === "undefined") {
+        toast({
+          title: "Nie udało się wygenerować SQL'a",
+          description: "Spróbuj ponownie",
+          status: "error",
+        });
+        setChatHistory(chatHistory.slice(0, -1));
+      } else {
+        setChatHistory([
+          ...chatHistory,
+          {
+            type: "bot",
+            message: data.sql_code,
+          },
+        ]);
+      }
     },
     onError: (data) => {
       toast({
@@ -143,9 +154,28 @@ export default function Chat() {
 
   if (activeStep === 1) {
     return (
-      <HStack h="100%">
-        <VStack w="100%" h="60vh">
-          <VStack w="100%">
+      <HStack h="100%" align="stretch" flexGrow={1}>
+        <VStack w="100%" minH="70vh">
+          <HStack w="100%">
+            <Button
+              onClick={() => {
+                setChatHistory([]);
+              }}
+            >
+              Reset
+            </Button>
+            <FormLabel>
+              Język polski (eksperymentalny*)
+              <Switch
+                ml={2}
+                checked={shouldTranslate}
+                onChange={(e) => {
+                  setShouldTranslate(e.target.checked);
+                }}
+              />
+            </FormLabel>
+          </HStack>
+          <VStack w="100%" h="100%" overflow="scroll">
             {chatHistory.map((chat, i) => (
               <>
                 <Card w="100%">
@@ -179,86 +209,167 @@ export default function Chat() {
                             <EditableInput />
                           </Editable>
                           {i === chatHistory.length - 1 ? (
-                            <Button
-                              variant="primary"
-                              onClick={async () => {
-                                if (typeof chat.message === "undefined") {
-                                  return;
-                                }
-
-                                runSQL
-                                  .mutateAsync({
-                                    dbUrl: databaseUrl!,
-                                    query: chat.message,
-                                  })
-                                  .then((result) => {
-                                    if (typeof result !== "undefined") {
-                                      setChatHistory((prev) => {
-                                        return prev.map((item, index) => {
-                                          if (index === i) {
-                                            return {
-                                              ...item,
-                                              data: result,
-                                            };
-                                          }
-
-                                          return item;
-                                        });
-                                      });
-                                    }
-                                  })
-                                  .catch((e) => {
-                                    if (e instanceof TRPCClientError) {
-                                      toast({
-                                        title: "Błąd w zapytaniu",
-                                        description: e.message,
-                                        status: "error",
-                                      });
-                                    }
+                            <>
+                              <Button
+                                isDisabled={generateChat.isLoading}
+                                onClick={() => {
+                                  setChatHistory((prev) => {
+                                    return prev.filter((_, index) => {
+                                      return index !== i;
+                                    });
                                   });
-                              }}
-                            >
-                              RUN
-                            </Button>
+
+                                  generateChat.mutate({
+                                    conversation: chatHistory
+                                      .filter(
+                                        (chat) =>
+                                          chat.message &&
+                                          chat.message.length > 2,
+                                      )
+                                      .map(
+                                        (chat) =>
+                                          `[${chat.type}]: ${chat.message}`,
+                                      )
+                                      .join("\n"),
+                                    schema: databaseSchema,
+                                    shouldTranslate,
+                                    user_input:
+                                      chatHistory.at(-2)?.message ?? "",
+                                  });
+                                }}
+                              >
+                                Regenerate
+                              </Button>
+                              <Button
+                                variant="primary"
+                                isLoading={runSQL.isLoading}
+                                onClick={async () => {
+                                  if (typeof chat.message === "undefined") {
+                                    return;
+                                  }
+
+                                  runSQL
+                                    .mutateAsync({
+                                      dbUrl: databaseUrl!,
+                                      query: chat.message,
+                                    })
+                                    .then((result) => {
+                                      if (typeof result !== "undefined") {
+                                        setChatHistory((prev) => {
+                                          return prev.map((item, index) => {
+                                            if (index === i) {
+                                              return {
+                                                ...item,
+                                                data: result,
+                                              };
+                                            }
+
+                                            return item;
+                                          });
+                                        });
+                                      }
+                                    })
+                                    .catch((e) => {
+                                      if (e instanceof TRPCClientError) {
+                                        toast({
+                                          title: "Błąd w zapytaniu",
+                                          description: e.message,
+                                          status: "error",
+                                        });
+                                      }
+                                    });
+                                }}
+                              >
+                                RUN
+                              </Button>
+                            </>
                           ) : null}
                         </HStack>
                       ) : (
-                        <Text ml={2}>{chat.message}</Text>
+                        <Editable
+                          w="100%"
+                          value={chat.message}
+                          onChange={(value) => {
+                            setChatHistory((prev) => {
+                              return prev.map((item, index) => {
+                                if (index === i) {
+                                  return {
+                                    ...item,
+                                    message: value,
+                                  };
+                                }
+
+                                return item;
+                              });
+                            });
+                          }}
+                          defaultValue={chat.message}
+                        >
+                          <EditablePreview />
+                          <EditableInput as={Textarea} />
+                        </Editable>
                       )}
                     </HStack>
                   </CardBody>
                 </Card>
                 {typeof chat.data !== "undefined" ? (
-                  <TableContainer w="100%" overflowY="scroll" maxH="500px">
-                    <Table
-                      layout=""
-                      overflowY="scroll"
-                      h="100%"
-                      variant="simple"
-                    >
-                      <Thead>
-                        <Tr>
-                          {chat.data.fields.map((field) => (
-                            <Th>{field.name}</Th>
-                          ))}
-                        </Tr>
-                      </Thead>
-                      <Tbody>
-                        {chat.data.rows.map((row) => (
+                  <Card w="100%">
+                    <TableContainer w="90%" overflowY="scroll" maxH="500px">
+                      <Table
+                        layout=""
+                        overflowY="scroll"
+                        h="100%"
+                        variant="striped"
+                      >
+                        <Thead>
                           <Tr>
-                            {row.map((cell) => (
-                              <Td>{cell}</Td>
+                            {chat.data.fields.map((field) => (
+                              <Th>{field.name}</Th>
                             ))}
                           </Tr>
-                        ))}
-                      </Tbody>
-                    </Table>
-                  </TableContainer>
+                        </Thead>
+                        <Tbody>
+                          {chat.data.rows.slice(0, 15).map((row) => (
+                            <Tr>
+                              {row.map((cell) => (
+                                <Td>{cell}</Td>
+                              ))}
+                            </Tr>
+                          ))}
+                        </Tbody>
+                      </Table>
+                    </TableContainer>
+                  </Card>
                 ) : null}
               </>
             ))}
           </VStack>
-          <HStack mt="auto" w="100%">
+          <HStack
+            as={"form"}
+            alignSelf="flex-end"
+            onSubmit={(e) => {
+              e.preventDefault();
+
+              generateChat.mutate({
+                conversation: chatHistory
+                  .map((chat) => `[${chat.type}]: ${chat.message}`)
+                  .join("\n"),
+                schema: databaseSchema,
+                shouldTranslate,
+                user_input: input,
+              });
+
+              setChatHistory([
+                ...chatHistory,
+                {
+                  type: "user",
+                  message: input,
+                },
+              ]);
+            }}
+            mt="auto"
+            w="100%"
+          >
             <Input
               value={input}
               onChange={(e) => {
@@ -269,21 +380,7 @@ export default function Chat() {
               placeholder="Find me..."
             />
             <Button
-              onClick={() => {
-                generateChat.mutate({
-                  conversation: "",
-                  schema: databaseSchema,
-                  user_input: input,
-                });
-
-                setChatHistory([
-                  ...chatHistory,
-                  {
-                    type: "user",
-                    message: input,
-                  },
-                ]);
-              }}
+              type="submit"
               isLoading={generateChat.isLoading}
               variant="primary"
             >
@@ -292,8 +389,9 @@ export default function Chat() {
           </HStack>
         </VStack>
         <Card
-          maxH="60vh"
-          h="100%"
+          maxH="70vh"
+          h="70vh"
+          position="sticky"
           w="40%"
           p={4}
           overflowY="scroll"
