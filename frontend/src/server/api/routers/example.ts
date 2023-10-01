@@ -8,7 +8,7 @@ import { OpenAIStream } from "ai";
 
 const getIntrospection = (
   dbUrl: string,
-  dbType: "postgres" | "mysql" | "sqlite",
+  dbType: "postgres" | "mysql" | "sqlite"
 ) => {
   if (fs.existsSync("./migrations")) {
     fs.rmdirSync("./migrations", { recursive: true });
@@ -17,12 +17,12 @@ const getIntrospection = (
   switch (dbType) {
     case "postgres":
       execSync(
-        `pnpm drizzle-kit introspect:pg --driver=pg --out=migrations/ --connectionString=${dbUrl}`,
+        `pnpm drizzle-kit introspect:pg --driver=pg --out=migrations/ --connectionString=${dbUrl}`
       ).toString();
       break;
     case "mysql":
       execSync(
-        `pnpm drizzle-kit introspect:mysql --driver=mysql2 --out=migrations/ --connectionString=${dbUrl}`,
+        `pnpm drizzle-kit introspect:mysql --driver=mysql2 --out=migrations/ --connectionString=${dbUrl}`
       ).toString();
       break;
   }
@@ -46,14 +46,14 @@ const getIntrospection = (
 /**
  * pl albo en
  */
-const translate =
-  "https://761d-2a09-bac5-5085-2dc-00-49-93.ngrok-free.app/translate";
+const apiHost =
+  process.env.API_HOST ||
+  "https://761d-2a09-bac5-5085-2dc-00-49-93.ngrok-free.app/";
+const translate = `${apiHost}/translate`;
 
-const llama13b =
-  "https://761d-2a09-bac5-5085-2dc-00-49-93.ngrok-free.app/process_message";
+const llama13b = `${apiHost}/process_message`;
 
-const codeLLama =
-  "https://3d26-2a09-bac1-5bc0-8-00-49-152.ngrok-free.app/fix_sql";
+const codeLLama = `${apiHost}/fix_sql`;
 
 // Create the fetch options
 const requestOptions = (requestBody2: {
@@ -141,7 +141,7 @@ const generateCompletion = async ({
       onCompletion(completion) {
         res(completion);
       },
-    }),
+    })
   );
 
   return stream;
@@ -155,7 +155,7 @@ export const exampleRouter = createTRPCRouter({
       z.object({
         dbUrl: z.string(),
         dbType: z.enum(["postgres", "mysql", "sqlite"]),
-      }),
+      })
     )
     .mutation(({ input }) => {
       const { dbUrl, dbType } = input;
@@ -171,7 +171,7 @@ export const exampleRouter = createTRPCRouter({
       z.object({
         dbUrl: z.string(),
         query: z.string(),
-      }),
+      })
     )
     .mutation(async ({ input }) => {
       if (input.dbUrl.startsWith("postgres")) {
@@ -199,7 +199,7 @@ export const exampleRouter = createTRPCRouter({
         conversation: z.string(),
         schema: z.string(),
         context: z.array(z.number()).nullable().default(null),
-      }),
+      })
     )
     .mutation(async ({ input }) => {
       if (input.shouldTranslate) {
@@ -223,7 +223,7 @@ export const exampleRouter = createTRPCRouter({
       console.log(JSON.stringify(input, null, 2));
 
       const columnMatch = input.schema.matchAll(
-        /CREATE TABLE.*? \(\s*(.*?)\);/gms,
+        /CREATE TABLE.*? \(\s*(.*?)\);/gms
       );
 
       if (input.shouldTranslate) {
@@ -232,12 +232,11 @@ export const exampleRouter = createTRPCRouter({
             .at(1)
             ?.split("\n")
             .map((t) => t.trim())
-            .map(
-              (t) =>
-                t
-                  .match(/"(.*?)"/gms)
-                  ?.at(0)
-                  ?.replaceAll(`"`, ""),
+            .map((t) =>
+              t
+                .match(/"(.*?)"/gms)
+                ?.at(0)
+                ?.replaceAll(`"`, "")
             )
             .filter(Boolean)
             .filter((c) => c && c.length > 4);
@@ -253,7 +252,7 @@ export const exampleRouter = createTRPCRouter({
                 targetLanguage: "en",
               }),
               original: c!,
-            })),
+            }))
           );
 
           const joined = translatedColumns.map((c) => ({
@@ -263,7 +262,7 @@ export const exampleRouter = createTRPCRouter({
 
           joined.forEach((line) => {
             const existingMapping = columnsMap.find(
-              (c) => c.original === line.original,
+              (c) => c.original === line.original
             );
             if (existingMapping) {
               return existingMapping.translated;
@@ -278,7 +277,7 @@ export const exampleRouter = createTRPCRouter({
             input.schema = input.schema.replaceAll(c.original, c.translated);
             input.user_input = input.user_input.replaceAll(
               c.original,
-              c.translated,
+              c.translated
             );
           });
 
@@ -297,11 +296,11 @@ export const exampleRouter = createTRPCRouter({
         columnsMap.forEach((c) => {
           response.message = response.message?.replaceAll(
             c.translated,
-            c.original,
+            c.original
           );
           response.sql_code = response.sql_code?.replaceAll(
             c.translated,
-            c.original,
+            c.original
           );
         });
       }
@@ -319,7 +318,7 @@ export const exampleRouter = createTRPCRouter({
         conversation: z.string(),
         schema: z.string(),
         context: z.array(z.number()).nullable().default(null),
-      }),
+      })
     )
     .mutation(async ({ input }) => {
       if (input.shouldTranslate) {
