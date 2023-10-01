@@ -18,5 +18,30 @@ services:
       dockerfile: Dockerfile.ollama
     networks:
       - ttd_network
+  # test db to query
+  postgres:
+    restart: always
+    image: postgres:13-alpine
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./frontend/postgres-data:/var/lib/postgresql/data
+      - ./frontend/dump.sql:/docker-entrypoint-initdb.d/dump.sql
+  frontend:
+    restart: always
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - API_HOST=http://backend:8000
+    networks:
+      - ttd_network
+
 networks:
   ttd_network:
